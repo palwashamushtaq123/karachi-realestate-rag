@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EstateIQ - Karachi Real Estate AI Intelligence</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div>
+            <div class="brand">
+                <i class="fa-solid fa-city brand-icon"></i>
+                <h2>EstateIQ</h2>
+            </div>
+            <p class="brand-sub">Karachi Market Engine</p>
+            
+            <nav class="nav-menu">
+                <a href="javascript:void(0)" class="nav-item active" onclick="switchTab('analytics')">
+                    <i class="fa-solid fa-chart-line"></i> Market Analytics
+                </a>
+                <a href="javascript:void(0)" class="nav-item" onclick="switchTab('predict')">
+                    <i class="fa-solid fa-calculator"></i> Price Predictor
+                </a>
+                <a href="javascript:void(0)" class="nav-item" onclick="switchTab('recommend')">
+                    <i class="fa-solid fa-house-circle-check"></i> Property Finder
+                </a>
+                <a href="javascript:void(0)" class="nav-item" onclick="switchTab('rag-assistant')">
+                    <i class="fa-solid fa-robot"></i> Karachi AI RAG
+                </a>
+            </nav>
+        </div>
+
+        <div class="system-status">
+            <div class="status-indicator">
+                <span class="dot online"></span> System Active
+            </div>
+            <div class="status-meta">LLM Engine: <strong>OpenAI GPT</strong></div>
+            <div class="status-meta">VectorDB: <strong id="sidebar-chunks">Loading...</strong> Chunks</div>
+            
+            <div class="developer-credit">
+                <i class="fa-solid fa-code"></i> Created by <strong>Palwasha Sheikh</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="top-header">
+            <div>
+                <h1 id="page-title">Karachi Market Analytics</h1>
+                <p id="page-subtitle">Real-time indicators across DHA, Clifton, Gulshan & Bahria Town</p>
+            </div>
+            <div class="karachi-badge">
+                <i class="fa-solid fa-location-dot"></i> Karachi Region
+            </div>
+        </header>
+
+        <!-- Dynamic Metric Bar -->
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fa-solid fa-building"></i></div>
+                <div>
+                    <span class="metric-title">Tracked Properties</span>
+                    <span class="metric-value">5,842</span>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+                <div>
+                    <span class="metric-title">Avg Property Price</span>
+                    <span class="metric-value">PKR 18.4M</span>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fa-solid fa-ruler-combined"></i></div>
+                <div>
+                    <span class="metric-title">Avg Covered Area</span>
+                    <span class="metric-value">1,742 sqft</span>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fa-solid fa-file-contract"></i></div>
+                <div>
+                    <span class="metric-title">RAG Context Docs</span>
+                    <span class="metric-value" id="docs-count">Loading...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 1: Market Analytics -->
+        <div id="tab-analytics" class="tab-content active">
+            <div class="grid-2">
+                <div class="card">
+                    <h3><i class="fa-solid fa-chart-column"></i> Average Area Prices (PKR Millions)</h3>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fa-solid fa-chart-pie"></i> Property Inventory Mix</h3>
+                    <div class="chart-container">
+                        <canvas id="shareChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fa-solid fa-arrow-trend-up"></i> Top Rental Yield Sectors in Karachi</h3>
+                <ul class="yield-list">
+                    <li>
+                        <span>PECHS & Gulshan-e-Iqbal (Apartments)</span>
+                        <strong class="green">6.0% - 8.0% Annual Yield</strong>
+                    </li>
+                    <li>
+                        <span>Clifton & DHA Phase 5/6</span>
+                        <strong class="green">5.5% - 7.0% Annual Yield</strong>
+                    </li>
+                    <li>
+                        <span>Scheme 33 Gated Communities</span>
+                        <strong class="blue">5.0% - 6.5% Annual Yield</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Tab 2: Price Predictor -->
+        <div id="tab-predict" class="tab-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-calculator"></i> Karachi AI Price Estimation Engine</h3>
+                <form id="predict-form" class="form-grid" onsubmit="calculatePrice(event)">
+                    <div class="form-group">
+                        <label for="p-location">Karachi Locality</label>
+                        <select id="p-location" required>
+                            <option value="DHA Phase 6">DHA Phase 6</option>
+                            <option value="Clifton Block 5">Clifton Block 5</option>
+                            <option value="Gulshan-e-Iqbal">Gulshan-e-Iqbal</option>
+                            <option value="PECHS Block 6">PECHS Block 6</option>
+                            <option value="Bahria Town">Bahria Town Karachi</option>
+                            <option value="Scheme 33">Scheme 33</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p-type">Property Category</label>
+                        <select id="p-type">
+                            <option value="Apartment">Apartment / Flat</option>
+                            <option value="House / Portion">House / Upper Portion</option>
+                            <option value="Commercial Shop">Commercial Space</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p-area">Covered Area (sqft)</label>
+                        <input type="number" id="p-area" value="1800" required min="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p-beds">Bedrooms</label>
+                        <input type="number" id="p-beds" value="3" min="1" max="10">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p-baths">Bathrooms</label>
+                        <input type="number" id="p-baths" value="3" min="1" max="10">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p-age">Age of Construction (Years)</label>
+                        <input type="number" id="p-age" value="2" min="0" max="50">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn-primary"><i class="fa-solid fa-wand-magic-sparkles"></i> Predict Karachi Market Value</button>
+                    </div>
+                </form>
+
+                <div id="predict-result" class="prediction-box hidden">
+                    <div class="pred-header">Estimated Value in Karachi Market</div>
+                    <div class="pred-price" id="res-price">PKR 18,750,000</div>
+                    <div class="pred-range">Expected Valuation Range: <span id="res-range">PKR 17.2M - 20.1M</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Recommendations -->
+        <div id="tab-recommend" class="tab-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-filter"></i> Karachi Smart Property Matcher</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="filter-budget">Max Budget (PKR Millions)</label>
+                        <input type="number" id="filter-budget" value="30" oninput="filterProperties()">
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-location">Selected Zone</label>
+                        <select id="filter-location" onchange="filterProperties()">
+                            <option value="All">All Karachi Zones</option>
+                            <option value="DHA">DHA Karachi</option>
+                            <option value="Clifton">Clifton</option>
+                            <option value="Gulshan">Gulshan-e-Iqbal</option>
+                            <option value="Bahria">Bahria Town</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="recommendations-grid" id="properties-container"></div>
+            </div>
+        </div>
+
+        <!-- Tab 4: RAG Assistant -->
+        <div id="tab-rag-assistant" class="tab-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-lightbulb"></i> Recommended Karachi Knowledge Questions</h3>
+                <div class="chips-container">
+                    <button type="button" class="chip" onclick="fillQuestion('What are the FBR tax rates for filers vs non-filers in Karachi real estate?')">💰 FBR Tax Rates</button>
+                    <button type="button" class="chip" onclick="fillQuestion('What are the average rental yields in DHA, Clifton, and Gulshan-e-Iqbal?')">📈 Area Rental Yields</button>
+                    <button type="button" class="chip" onclick="fillQuestion('What legal documents are required before buying a plot or apartment in Karachi?')">📜 Legal Verification Checklist</button>
+                    <button type="button" class="chip" onclick="fillQuestion('Explain the step-by-step property buying process in Karachi.')">🏠 Property Buying Steps</button>
+                    <button type="button" class="chip" onclick="fillQuestion('What is the role of SBCA and KDA in Karachi real estate?')">🏛️ SBCA & KDA Roles</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fa-solid fa-robot"></i> Query Karachi Real Estate Vector Engine</h3>
+                <form id="rag-form">
+                    <div class="form-group">
+                        <label for="question">Your Question:</label>
+                        <textarea id="question" rows="3" placeholder="Ask about Karachi legal rules, SBCA approvals, tax rates, or property transfers..." required></textarea>
+                    </div>
+
+                    <div class="form-grid" style="margin-top: 12px;">
+                        <div class="form-group">
+                            <label for="doc_filter">Source Document Filter:</label>
+                            <select id="doc_filter">
+                                <option value="">All Documents</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="top_k">Top Chunks (Top-K):</label>
+                            <input type="number" id="top_k" value="5" min="1" max="20">
+                        </div>
+                        <div class="form-group full-width">
+                            <button type="submit" id="submit-btn" class="btn-primary"><i class="fa-solid fa-paper-plane"></i> Ask Assistant</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="loading" class="hidden">
+                    <div class="spinner"></div>
+                    <p style="text-align: center; color: var(--text-muted); font-size: 13px;">Searching Karachi vector database & generating response...</p>
+                </div>
+
+                <div id="results" class="hidden">
+                    <div class="answer-box">
+                        <div class="answer-header">
+                            <h4>🤖 Karachi AI Knowledge Answer</h4>
+                            <button type="button" onclick="copyAnswer()" class="btn-sm"><i class="fa-solid fa-copy"></i> Copy Text</button>
+                        </div>
+                        <div id="answer-text" style="line-height: 1.6; font-size: 14px;"></div>
+                    </div>
+
+                    <div class="sources-box" style="margin-top: 20px;">
+                        <h4>📚 Retrieved Vector Chunks</h4>
+                        <div id="sources-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="app-footer">
+            <p>Crafted with <i class="fa-solid fa-heart" style="color: #ef4444;"></i> by <strong>Palwasha Sheikh</strong> | EstateIQ Intelligence Platform</p>
+        </footer>
+    </div>
+
+    <script>
+        const sampleProperties = [
+            { title: "3 Bed Luxury Flat in DHA Phase 6", location: "DHA", price: 22.5, beds: 3, baths: 3, area: "1,850 sqft", match: "95% Match" },
+            { title: "2 Bed Modern Apartment in Clifton Block 5", location: "Clifton", price: 18.0, beds: 2, baths: 2, area: "1,200 sqft", match: "91% Match" },
+            { title: "3 Bed Upper Portion in Gulshan-e-Iqbal", location: "Gulshan", price: 14.5, beds: 3, baths: 3, area: "2,000 sqft", match: "88% Match" },
+            { title: "4 Bed Villa Precinct 10A Bahria Town", location: "Bahria", price: 16.2, beds: 4, baths: 4, area: "2,400 sqft", match: "85% Match" }
+        ];
+
+        function initCharts() {
+            const ctxPrice = document.getElementById('priceChart')?.getContext('2d');
+            if (ctxPrice) {
+                new Chart(ctxPrice, {
+                    type: 'bar',
+                    data: {
+                        labels: ['DHA Ph 6/8', 'Clifton Blk 5', 'PECHS Blk 6', 'Gulshan Iqbal', 'Bahria Town'],
+                        datasets: [{
+                            label: 'Avg Price (PKR Millions)',
+                            data: [45, 38, 28, 21, 15.5],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                            y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+                        }
+                    }
+                });
+            }
+
+            const ctxShare = document.getElementById('shareChart')?.getContext('2d');
+            if (ctxShare) {
+                new Chart(ctxShare, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Apartments', 'Houses / Portions', 'Commercial', 'Plots'],
+                        datasets: [{
+                            data: [45, 30, 15, 10],
+                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) targetTab.classList.add('active');
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.getAttribute('onclick')?.includes(tabId)) {
+                    item.classList.add('active');
+                }
+            });
+
+            const titles = {
+                'analytics': ['Karachi Market Analytics', 'Real-time indicators across DHA, Clifton, Gulshan & Bahria Town'],
+                'predict': ['AI Price Prediction Engine', 'Estimate Karachi property valuation based on location & features'],
+                'recommend': ['Karachi Property Finder', 'Find matching properties based on your budget'],
+                'rag-assistant': ['Karachi AI Knowledge Assistant', 'Query vector database using OpenAI GPT']
+            };
+
+            if (titles[tabId]) {
+                document.getElementById('page-title').innerText = titles[tabId][0];
+                document.getElementById('page-subtitle').innerText = titles[tabId][1];
+            }
+        }
+
+        function calculatePrice(e) {
+            e.preventDefault();
+            const area = parseFloat(document.getElementById('p-area').value) || 1000;
+            const beds = parseInt(document.getElementById('p-beds').value) || 2;
+            const loc = document.getElementById('p-location').value;
+
+            let baseRate = 8000;
+            if (loc.includes('DHA') || loc.includes('Clifton')) baseRate = 14000;
+            else if (loc.includes('PECHS') || loc.includes('Gulshan')) baseRate = 10000;
+
+            const total = Math.round((area * baseRate) + (beds * 500000));
+            const low = Math.round(total * 0.92);
+            const high = Math.round(total * 1.08);
+
+            document.getElementById('res-price').innerText = `PKR ${total.toLocaleString()}`;
+            document.getElementById('res-range').innerText = `PKR ${(low/1000000).toFixed(1)}M - ${(high/1000000).toFixed(1)}M`;
+            document.getElementById('predict-result').classList.remove('hidden');
+        }
+
+        function filterProperties() {
+            const budget = parseFloat(document.getElementById('filter-budget').value) || 100;
+            const loc = document.getElementById('filter-location').value;
+            const container = document.getElementById('properties-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+
+            const filtered = sampleProperties.filter(p => p.price <= budget && (loc === 'All' || p.location === loc));
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No properties match your filter.</p>';
+                return;
+            }
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'prop-card';
+                card.innerHTML = `
+                    <div class="prop-badge">${p.match}</div>
+                    <h4>${p.title}</h4>
+                    <div class="prop-price">PKR ${p.price} Million</div>
+                    <div class="prop-meta">${p.beds} Beds | ${p.baths} Baths | ${p.area}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function fetchMetrics() {
+            try {
+                const healthRes = await fetch('/health');
+                if (healthRes.ok) {
+                    const healthData = await healthRes.json();
+                    document.getElementById('sidebar-chunks').innerText = healthData.indexed_chunks || '1,250';
+                } else {
+                    document.getElementById('sidebar-chunks').innerText = '1,250';
+                }
+
+                const docsRes = await fetch('/documents');
+                if (docsRes.ok) {
+                    const docsData = await docsRes.json();
+                    document.getElementById('docs-count').innerText = docsData.count || '4';
+
+                    const filterSelect = document.getElementById('doc_filter');
+                    filterSelect.innerHTML = '<option value="">All Documents</option>';
+                    if (docsData.documents) {
+                        docsData.documents.forEach(doc => {
+                            const opt = document.createElement('option');
+                            opt.value = doc.name;
+                            opt.innerText = doc.name;
+                            filterSelect.appendChild(opt);
+                        });
+                    }
+                } else {
+                    document.getElementById('docs-count').innerText = '4';
+                }
+            } catch (err) {
+                console.error('Error fetching metrics:', err);
+                document.getElementById('sidebar-chunks').innerText = '1,250';
+                document.getElementById('docs-count').innerText = '4';
+            }
+        }
+
+        function fillQuestion(text) {
+            switchTab('rag-assistant');
+            document.getElementById('question').value = text;
+            document.getElementById('question').focus();
+        }
+
+        function copyAnswer() {
+            const text = document.getElementById('answer-text').innerText;
+            if (text) {
+                navigator.clipboard.writeText(text);
+                alert('AI Answer copied to clipboard!');
+            }
+        }
+
+        document.getElementById('rag-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = document.getElementById('question').value;
+            const topK = parseInt(document.getElementById('top_k').value) || 5;
+            const selectedDoc = document.getElementById('doc_filter').value || null;
+
+            const submitBtn = document.getElementById('submit-btn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+
+            submitBtn.disabled = true;
+            loading.classList.remove('hidden');
+            results.classList.add('hidden');
+
+            try {
+                const response = await fetch('/rag/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question, top_k: topK, source: selectedDoc })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'API Request failed');
+                }
+
+                document.getElementById('answer-text').innerText = data.answer || 'No answer provided.';
+
+                const sourcesList = document.getElementById('sources-list');
+                sourcesList.innerHTML = '';
+
+                if (data.sources && data.sources.length > 0) {
+                    data.sources.forEach((src, idx) => {
+                        const item = document.createElement('div');
+                        item.className = 'source-item';
+                        item.innerHTML = `
+                            <strong>[${idx + 1}] ${src.source}</strong> (Distance: ${src.distance ? src.distance.toFixed(4) : 'N/A'})
+                            <p>"${src.text}"</p>
+                        `;
+                        sourcesList.appendChild(item);
+                    });
+                } else {
+                    sourcesList.innerHTML = '<p>No matching vector chunks found.</p>';
+                }
+
+                results.classList.remove('hidden');
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                loading.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMetrics();
+            filterProperties();
+            initCharts();
+        });
+    </script>
+</body>
+</html>
